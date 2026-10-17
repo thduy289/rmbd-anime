@@ -1,0 +1,514 @@
+{% extends 'base.html' %}
+
+{% block title %}Hôm Nay Xem Gì? - Vòng Quay Anime{% endblock %}
+
+{% block content %}
+<style>
+    /* TIÊU ĐỀ */
+    .random-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .random-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        background: var(--anime-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.5px;
+        text-transform: uppercase;
+    }
+
+    /* BƯỚC 1: CHỌN THỂ LOẠI (TAG CHIPS) */
+    .genre-filter-card {
+        background: rgba(22, 27, 46, 0.45);
+        backdrop-filter: blur(15px);
+        border: 1px solid var(--border-glass);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 35px;
+    }
+    .genre-chips-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        max-height: 160px;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+    .genre-chips-container::-webkit-scrollbar {
+        width: 5px;
+    }
+    .genre-chips-container::-webkit-scrollbar-thumb {
+        background: rgba(255, 42, 109, 0.4);
+        border-radius: 10px;
+    }
+    .genre-chip {
+        padding: 6px 16px;
+        border-radius: 50px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        user-select: none;
+    }
+    .genre-chip:hover {
+        background: rgba(255, 42, 109, 0.15);
+        border-color: var(--anime-pink);
+        color: #fff;
+    }
+    .genre-chip.active {
+        background: var(--anime-gradient);
+        border-color: transparent;
+        color: #fff;
+        box-shadow: 0 0 15px rgba(255, 42, 109, 0.45);
+    }
+
+    /* BƯỚC 2: KHUNG ROULETTE CS2 */
+    .roulette-container {
+        position: relative;
+        width: 100%;
+        max-width: 900px;
+        height: 250px;
+        margin: 0 auto 30px;
+        background: #0f121d;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), inset 0 0 40px rgba(0,0,0,0.8);
+    }
+
+    /* VẠCH KIM ĐỎ TRỎ Ở GIỮA KHUNG */
+    .needle {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 4px;
+        height: 100%;
+        background: var(--anime-pink);
+        box-shadow: 0 0 15px var(--anime-pink), 0 0 30px var(--anime-pink);
+        z-index: 50;
+    }
+    .needle::before, .needle::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 9px solid transparent;
+        border-right: 9px solid transparent;
+    }
+    .needle::before {
+        top: 0;
+        border-top: 12px solid var(--anime-pink);
+    }
+    .needle::after {
+        bottom: 0;
+        border-bottom: 12px solid var(--anime-pink);
+    }
+
+    /* DẢI BĂNG BĂNG CHUYỀN (REEL STRIP) */
+    .reel-strip {
+        display: flex;
+        gap: 14px;
+        position: absolute;
+        top: 20px;
+        left: 0;
+        will-change: transform;
+        transition: transform 6s cubic-bezier(0.12, 0.85, 0.18, 1);
+    }
+
+    /* THẺ ANIME TRONG DẢI BĂNG */
+    .reel-card {
+        min-width: 150px;
+        max-width: 150px;
+        height: 210px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-glass);
+        border-radius: 12px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+    .reel-card img {
+        width: 100%;
+        height: 155px;
+        object-fit: cover;
+    }
+    .reel-card-info {
+        padding: 8px 10px;
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        background: #121626;
+    }
+    .reel-card-title {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #fff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+    }
+
+    /* NÚT QUAY */
+    .spin-btn-wrapper {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    .spin-btn {
+        background: var(--anime-gradient);
+        border: none;
+        color: #fff;
+        font-size: 1.15rem;
+        font-weight: 800;
+        letter-spacing: 2px;
+        padding: 16px 50px;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 10px 30px rgba(255, 42, 109, 0.45);
+        transition: all 0.3s ease;
+    }
+    .spin-btn:hover:not(:disabled) {
+        transform: translateY(-4px) scale(1.04);
+        box-shadow: 0 15px 45px rgba(255, 42, 109, 0.65);
+    }
+    .spin-btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        filter: grayscale(1);
+    }
+
+    /* MODAL KẾT QUẢ KHI QUAY XONG */
+    .winner-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(7, 9, 14, 0.85);
+        backdrop-filter: blur(15px);
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.35s ease;
+        padding: 20px;
+    }
+    .winner-modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    .winner-card {
+        background: var(--bg-card);
+        border: 2px solid var(--anime-pink);
+        border-radius: 20px;
+        max-width: 550px;
+        width: 100%;
+        overflow: hidden;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.9), 0 0 35px rgba(255, 42, 109, 0.5);
+        transform: scale(0.85);
+        transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        text-align: center;
+        padding: 30px;
+        position: relative;
+    }
+    .winner-modal-overlay.active .winner-card {
+        transform: scale(1);
+    }
+    .winner-poster {
+        width: 160px;
+        height: 230px;
+        object-fit: cover;
+        border-radius: 12px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+        border: 2px solid rgba(255,255,255,0.2);
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="container py-4">
+    <!-- TIÊU ĐỀ -->
+    <div class="random-header">
+        <h2 class="random-title"><i class="fas fa-dice text-danger me-2"></i>Hôm Nay Xem Gì?</h2>
+        <p class="text-secondary small">Chọn thể loại bạn muốn xem, để chiếc hòm CS2 chọn phim cho bạn!</p>
+    </div>
+
+    <!-- BƯỚC 1: BỘ LỌC THỂ LOẠI -->
+    <div class="genre-filter-card">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <span class="fw-bold text-white small text-uppercase">
+                <i class="fas fa-filter text-danger me-1"></i> Bước 1: Chọn Thể Loại Phim
+            </span>
+            <div class="text-secondary small">
+                Có <span id="poolCount" class="text-white fw-bold">0</span> phim sẵn sàng
+            </div>
+        </div>
+        <div class="genre-chips-container" id="genresContainer">
+            <div class="genre-chip active" data-genre="all">Tất cả</div>
+            {% for g in genres %}
+            <div class="genre-chip" data-genre="{{ g }}">{{ g }}</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- BƯỚC 2: KHUNG ROULETTE CS2 -->
+    <div class="roulette-container" id="rouletteBox">
+        <div class="needle"></div>
+        <div class="reel-strip" id="reelStrip"></div>
+    </div>
+
+    <!-- NÚT MỞ HÒM -->
+    <div class="spin-btn-wrapper">
+        <button class="spin-btn" id="btnSpin">
+            <i class="fas fa-play me-2"></i> QUAY NGAY
+        </button>
+    </div>
+</div>
+
+<!-- POPUP HIỂN THỊ KẾT QUẢ -->
+<div class="winner-modal-overlay" id="winnerModal">
+    <div class="winner-card">
+        <div class="badge bg-danger px-3 py-1 mb-2 text-uppercase fw-bold" style="background: var(--anime-gradient) !important;">
+            🎉 ANIME HÔM NAY CỦA BẠN
+        </div>
+        <div class="d-flex justify-content-center">
+            <img src="" id="winnerPoster" class="winner-poster" alt="Winner">
+        </div>
+        <h3 class="fw-bold text-white mb-1" id="winnerTitle"></h3>
+        <p class="text-secondary small fst-italic mb-3" id="winnerTitleEn"></p>
+        <div class="d-flex justify-content-center gap-2 mb-4">
+            <span class="badge bg-secondary-subtle text-light" id="winnerYear"></span>
+            <span class="badge bg-secondary-subtle text-light" id="winnerEpisodes"></span>
+        </div>
+        <div class="d-flex justify-content-center gap-3">
+            <!-- ĐỔI TÊN NÚT SANG TẢI PHỤ ĐỀ -->
+            <a href="#" id="winnerLink" class="btn btn-danger px-4 py-2 fw-bold rounded-pill" style="background: var(--anime-gradient); border: none;">
+                <i class="fas fa-download me-2"></i> TẢI PHỤ ĐỀ
+            </a>
+            <button class="btn btn-outline-secondary px-4 py-2 fw-bold rounded-pill" id="btnCloseModal">
+                Quay Lại
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 1. LẤY VÀ LỌC SẠCH TRÙNG LẶP DỮ LIỆU BAN ĐẦU
+    const RAW_ANIME = {{ anime_list | tojson }};
+    
+    // Khử trùng lặp qua Map Slug
+    const animeMap = new Map();
+    RAW_ANIME.forEach(item => {
+        const key = item.slug || item.title_ro;
+        if (!animeMap.has(key)) {
+            animeMap.set(key, item);
+        }
+    });
+    const ALL_ANIME = Array.from(animeMap.values());
+
+    let selectedGenres = new Set(["all"]);
+    let currentPool = [...ALL_ANIME];
+
+    const reel = document.getElementById("reelStrip");
+    const rouletteBox = document.getElementById("rouletteBox");
+    const btnSpin = document.getElementById("btnSpin");
+    const poolCountEl = document.getElementById("poolCount");
+    const genresContainer = document.getElementById("genresContainer");
+
+    const winnerModal = document.getElementById("winnerModal");
+    const winnerPoster = document.getElementById("winnerPoster");
+    const winnerTitle = document.getElementById("winnerTitle");
+    const winnerTitleEn = document.getElementById("winnerTitleEn");
+    const winnerYear = document.getElementById("winnerYear");
+    const winnerEpisodes = document.getElementById("winnerEpisodes");
+    const winnerLink = document.getElementById("winnerLink");
+    const btnCloseModal = document.getElementById("btnCloseModal");
+
+    const CARD_WIDTH = 150;
+    const CARD_GAP = 14;
+    const TOTAL_CARDS = 60;
+    const WIN_INDEX = 48;
+
+    // 2. ÂM THANH TICK CS2
+    let audioCtx = null;
+    function playTickSound() {
+        try {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.04);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.04);
+        } catch(e) {}
+    }
+
+    // 3. LỌC DANH SÁCH THEO THỂ LOẠI
+    function filterAnime() {
+        if (selectedGenres.has("all") || selectedGenres.size === 0) {
+            currentPool = [...ALL_ANIME];
+        } else {
+            currentPool = ALL_ANIME.filter(anime => {
+                return anime.genres.some(g => selectedGenres.has(g));
+            });
+        }
+
+        poolCountEl.innerText = currentPool.length;
+        btnSpin.disabled = currentPool.length < 2;
+
+        initReel();
+    }
+
+    // 4. XỬ LÝ CLICK CHỌN THỂ LOẠI
+    genresContainer.addEventListener("click", (e) => {
+        const chip = e.target.closest(".genre-chip");
+        if (!chip) return;
+        const genre = chip.dataset.genre;
+
+        if (genre === "all") {
+            selectedGenres.clear();
+            selectedGenres.add("all");
+            document.querySelectorAll(".genre-chip").forEach(c => c.classList.remove("active"));
+            chip.classList.add("active");
+        } else {
+            selectedGenres.delete("all");
+            document.querySelector('.genre-chip[data-genre="all"]').classList.remove("active");
+
+            if (selectedGenres.has(genre)) {
+                selectedGenres.delete(genre);
+                chip.classList.remove("active");
+                if (selectedGenres.size === 0) {
+                    selectedGenres.add("all");
+                    document.querySelector('.genre-chip[data-genre="all"]').classList.add("active");
+                }
+            } else {
+                selectedGenres.add(genre);
+                chip.classList.add("active");
+            }
+        }
+        filterAnime();
+    });
+
+    function createCard(item) {
+        const el = document.createElement("div");
+        el.className = "reel-card";
+        el.innerHTML = `
+            <img src="${item.poster_url}" alt="${item.title_ro}" loading="lazy">
+            <div class="reel-card-info">
+                <div class="reel-card-title">${item.title_ro}</div>
+            </div>
+        `;
+        return el;
+    }
+
+    // 5. TẠO DẢI BĂNG QUAY (THUẬT TOÁN CHỐNG TRÙNG LẶP 2 Ô LIỀN KỀ)
+    function getRandomNonAdjacent(pool, previousItem) {
+        if (pool.length <= 1) return pool[0];
+        let chosen;
+        let tries = 0;
+        do {
+            chosen = pool[Math.floor(Math.random() * pool.length)];
+            tries++;
+        } while (previousItem && chosen.slug === previousItem.slug && tries < 15);
+        return chosen;
+    }
+
+    function initReel() {
+        reel.style.transition = "none";
+        reel.style.transform = "translateX(0px)";
+        reel.innerHTML = "";
+        if (currentPool.length === 0) return;
+
+        let prev = null;
+        for (let i = 0; i < TOTAL_CARDS; i++) {
+            const item = getRandomNonAdjacent(currentPool, prev);
+            prev = item;
+            reel.appendChild(createCard(item));
+        }
+    }
+
+    // 6. KÍCH HOẠT VÒNG QUAY ROULETTE CS2
+    btnSpin.addEventListener("click", () => {
+        if (currentPool.length < 2) return;
+        btnSpin.disabled = true;
+
+        // A. Chọn phim thắng cuộc ngẫu nhiên
+        const winner = currentPool[Math.floor(Math.random() * currentPool.length)];
+
+        // B. Gắn phim thắng vào đúng ô WIN_INDEX (và đảm bảo 2 ô liền kề không bị trùng)
+        reel.style.transition = "none";
+        reel.style.transform = "translateX(0px)";
+        reel.innerHTML = "";
+
+        let prev = null;
+        for (let i = 0; i < TOTAL_CARDS; i++) {
+            let item;
+            if (i === WIN_INDEX) {
+                item = winner;
+            } else {
+                item = getRandomNonAdjacent(currentPool, prev);
+                // Tránh để ô sát cạnh ô thắng bị trùng với ô thắng
+                if (i === WIN_INDEX - 1 && item.slug === winner.slug && currentPool.length > 1) {
+                    item = currentPool.find(x => x.slug !== winner.slug) || item;
+                }
+            }
+            prev = item;
+            reel.appendChild(createCard(item));
+        }
+
+        // C. Tính tọa độ dừng ở giữa kim
+        const viewportCenter = rouletteBox.clientWidth / 2;
+        const cardCenter = CARD_WIDTH / 2;
+        const targetX = (WIN_INDEX * (CARD_WIDTH + CARD_GAP));
+        
+        // Độ lệch ngẫu nhiên (-35px đến +35px)
+        const randomOffset = (Math.random() - 0.5) * 70;
+        const finalTranslateX = -(targetX - viewportCenter + cardCenter) + randomOffset;
+
+        // D. Chạy Animation 6 giây
+        setTimeout(() => {
+            reel.style.transition = "transform 6s cubic-bezier(0.12, 0.85, 0.18, 1)";
+            reel.style.transform = `translateX(${finalTranslateX}px)`;
+
+            let ticks = 0;
+            const tickInterval = setInterval(() => {
+                playTickSound();
+                ticks++;
+                if (ticks > 40) clearInterval(tickInterval);
+            }, 140);
+        }, 50);
+
+        // E. Hiện popup kết quả sau 6.2 giây
+        setTimeout(() => {
+            btnSpin.disabled = false;
+            winnerPoster.src = winner.poster_url;
+            winnerTitle.innerText = winner.title_ro;
+            winnerTitleEn.innerText = winner.title_en || "";
+            winnerYear.innerText = winner.year || "Anime";
+            winnerEpisodes.innerText = (winner.episodes_sub || winner.episodes || "1") + " Tập";
+            winnerLink.href = `/anime/${winner.slug}`;
+            winnerModal.classList.add("active");
+        }, 6200);
+    });
+
+    btnCloseModal.addEventListener("click", () => {
+        winnerModal.classList.remove("active");
+    });
+
+    filterAnime();
+</script>
+{% endblock %}
