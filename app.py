@@ -311,6 +311,62 @@ def refresh_cache():
         "status": "success",
         "message": "Đã làm mới dữ liệu từ Notion thành công!",
     }
+    
+    
+# --- ROUTE: HÔM NAY XEM GÌ (ĐÃ LỌC KHỬ TRÙNG LẶP) ---
+@app.route("/random")
+def random_anime():
+    data = get_data()
+    valid_data = [x for x in data if x.get("sub_url") and x.get("is_public")]
+
+    # KHỬ TRÙNG LẶP: Đảm bảo mỗi bộ phim chỉ xuất hiện đúng 1 lần duy nhất
+    seen_keys = set()
+    unique_anime = []
+    for a in valid_data:
+        # Nhận diện theo tên Romanji và năm
+        uniq_key = (
+            (a.get("title_ro") or "").strip().lower(),
+            (a.get("year") or "").strip().lower(),
+        )
+        if uniq_key in seen_keys:
+            continue
+        seen_keys.add(uniq_key)
+        unique_anime.append(a)
+
+    # Tách và gom các thể loại duy nhất
+    genres_set = set()
+    for x in unique_anime:
+        if x.get("genres"):
+            for g in x["genres"].split(","):
+                g_clean = g.strip()
+                if g_clean:
+                    genres_set.add(g_clean)
+
+    genres_list = sorted(list(genres_set))
+
+    anime_json_list = [
+        {
+            "title_ro": a.get("title_ro", ""),
+            "title_en": a.get("title_en", ""),
+            "poster_url": a.get("poster_url", ""),
+            "genres": [
+                g.strip() for g in a.get("genres", "").split(",") if g.strip()
+            ],
+            "slug": a.get("slug", ""),
+            "year": a.get("year", ""),
+            "type": a.get("type", ""),
+            "episodes": a.get("episodes", ""),
+            "episodes_sub": a.get("episodes_sub", ""),
+            "summary": a.get("summary", ""),
+            "raw_type": a.get("raw_type", ""),
+            "sub_url": a.get("sub_url", ""),
+        }
+        for a in unique_anime
+    ]
+
+    return render_template(
+        "random.html", genres=genres_list, anime_list=anime_json_list
+    )
 
 
 if __name__ == "__main__":
