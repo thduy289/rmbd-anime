@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="vi" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}RMBD{% endblock %}</title>
+    
+    <!-- FAVICON DUY NHẤT TRÊN TAB TRÌNH DUYỆT -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon.png') }}">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Bootstrap 5.3 & Swiper 11 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    <style>
+        :root {
+            --bg-color: #0b0d14;
+            --bg-card: rgba(22, 27, 46, 0.7);
+            --bg-card-hover: rgba(30, 37, 63, 0.95);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --anime-pink: #ff2a6d;
+            --anime-purple: #8b5cf6;
+            --anime-cyan: #05d9e8;
+            --anime-gradient: linear-gradient(135deg, #ff2a6d 0%, #8b5cf6 100%);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(255, 42, 109, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+        a { text-decoration: none; color: inherit; }
+
+        /* --- CON TRỎ CHUỘT GIF ẢO --- */
+        #anime-cursor {
+            position: fixed;
+            top: -100px;
+            left: -100px;
+            width: 36px;
+            height: 36px;
+            pointer-events: none;
+            z-index: 9999999;
+            transform: translate(-10%, -10%);
+            transition: transform 0.12s ease-out;
+            display: none;
+        }
+        #anime-cursor img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        #anime-cursor.cursor-hover {
+            transform: translate(-10%, -10%) scale(1.28);
+            filter: drop-shadow(0 0 10px var(--anime-pink));
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            body.has-custom-cursor,
+            body.has-custom-cursor * {
+                cursor: none !important;
+            }
+        }
+
+        /* --- MÀN HÌNH CHỜ LOAD TRANG VỚI ẢNH GIF RIÊNG --- */
+        #page-loader {
+            position: fixed;
+            inset: 0;
+            background: #07090e;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+        #page-loader.fade-out {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Định hình kích thước ảnh GIF tải trang */
+        .loader-gif {
+            width: 140px;          /* Bạn có thể chỉnh to/nhỏ tùy ý ở đây */
+            height: auto;
+            max-height: 160px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 15px rgba(255, 42, 109, 0.45));
+            margin-bottom: 12px;
+        }
+
+        .loader-text {
+            font-size: 0.85rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 800;
+            background: var(--anime-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulseText 1.5s ease-in-out infinite alternate;
+        }
+        @keyframes pulseText {
+            from { opacity: 0.4; }
+            to { opacity: 1; }
+        }
+
+        /* --- NAVBAR --- */
+        .anime-navbar {
+            background: rgba(11, 13, 20, 0.85);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border-glass);
+            padding: 12px 0;
+        }
+        .anime-brand {
+            font-weight: 800;
+            font-size: 1.6rem;
+            letter-spacing: -0.5px;
+            background: var(--anime-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .nav-link-anime {
+            color: var(--text-muted) !important;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 8px 16px !important;
+            border-radius: 8px;
+            transition: all 0.25s ease;
+        }
+        .nav-link-anime:hover, .nav-link-anime.active {
+            color: #fff !important;
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 15px rgba(255, 42, 109, 0.25);
+        }
+
+        /* --- HỆ THỐNG GRID CHUNG (PC & MOBILE) --- */
+        .anime-responsive-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 1400px) { .anime-responsive-grid { grid-template-columns: repeat(5, 1fr); } }
+        @media (max-width: 1100px) { .anime-responsive-grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 768px)  { .anime-responsive-grid { grid-template-columns: repeat(3, 1fr); gap: 14px; } }
+        @media (max-width: 500px)  { .anime-responsive-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
+
+        /* --- THẺ ANIME CARD V2 HIỆN ĐẠI --- */
+        .anime-card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            height: 100%;
+        }
+        .anime-card-v2 {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            backdrop-filter: blur(8px);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+        }
+        .anime-card-v2:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(255, 42, 109, 0.5);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 42, 109, 0.25);
+            background: var(--bg-card-hover);
+        }
+        .poster-container {
+            position: relative;
+            padding-top: 142%;
+            overflow: hidden;
+            background: #111422;
+        }
+        .poster-container img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .anime-card-v2:hover .poster-container img {
+            transform: scale(1.08);
+        }
+        .badge-ep {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(11, 13, 20, 0.85);
+            border: 1px solid rgba(255,255,255,0.15);
+            backdrop-filter: blur(6px);
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+        .badge-raw {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--anime-gradient);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+        .card-info-v2 {
+            padding: 13px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .title-ro {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            line-height: 1.35;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            color: #fff;
+            transition: color 0.2s;
+        }
+        .anime-card-v2:hover .title-ro {
+            color: var(--anime-pink);
+        }
+        .card-meta-v2 {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            margin-top: auto;
+            background: #07080d;
+            border-top: 1px solid var(--border-glass);
+            padding: 30px 0 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CON TRỎ CHUỘT GIF ẢO -->
+    <div id="anime-cursor">
+        <img src="{{ url_for('static', filename='cursor.gif') }}" alt="Cursor">
+    </div>
+
+    <!-- MÀN HÌNH CHỜ LOAD TRANG (ĐÃ THAY BẰNG ẢNH GIF RIÊNG) -->
+    <div id="page-loader">
+        <img src="{{ url_for('static', filename='loading.gif') }}" class="loader-gif" alt="Loading..." onerror="this.style.display='none'">
+        <div class="loader-text"><i class="fas fa-play-circle me-1"></i> CHỜ CHÚT NHÉ...</div>
+    </div>
+
+    <!-- THANH NAVBAR -->
+    <nav class="navbar navbar-expand-lg sticky-top anime-navbar">
+        <div class="container">
+            <a class="anime-brand text-decoration-none" href="/">
+                RMB<span class="text-white">D</span>
+            </a>
+            <button class="navbar-toggler border-0 shadow-none text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navAnime">
+                <i class="fas fa-bars-staggered fa-lg"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navAnime">
+                <ul class="navbar-nav ms-auto align-items-center gap-1 mt-3 mt-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link-anime {{ 'active' if request.path == '/' else '' }}" href="/">
+                            <i class="fas fa-fire me-1"></i> Trang Chủ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link-anime {{ 'active' if request.path == '/list' else '' }}" href="/list">
+                            <i class="fas fa-layer-group me-1"></i> Danh Sách
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link-anime {{ 'active' if request.path == '/chat' else '' }}" href="/chat">
+                            <i class="fab fa-discord me-1" style="color: #5865F2;"></i> Chat
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- NỘI DUNG TỪNG TRANG -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container text-center">
+            <div class="anime-brand justify-content-center mb-3" style="font-size: 1.3rem;">
+                RMB<span class="text-white">D</span>
+            </div>
+            <div class="d-flex justify-content-center gap-3 mb-3">
+                <a href="https://discord.gg/2xhEsE63rJ" target="_blank" rel="noopener" class="text-secondary hover-pink"><i class="fab fa-discord fa-lg"></i></a>
+            </div>
+            <div class="text-muted small">&copy; 2026 RMBD</div>
+        </div>
+    </footer>
+
+    <!-- JS LIBS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <!-- 1. SCRIPT ĐIỀU KHIỂN PAGE LOADER -->
+    <script>
+        function hidePageLoader() {
+            const loader = document.getElementById('page-loader');
+            if (loader) {
+                loader.classList.add('fade-out');
+            }
+        }
+
+        window.addEventListener('load', hidePageLoader);
+        window.addEventListener('pageshow', function(event) {
+            hidePageLoader();
+        });
+        window.addEventListener('popstate', hidePageLoader);
+        setTimeout(hidePageLoader, 2500);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const links = document.querySelectorAll('a[href]:not([target="_blank"]):not([href^="#"]):not([href^="javascript:"])');
+            links.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                    const loader = document.getElementById('page-loader');
+                    if (loader) {
+                        loader.classList.remove('fade-out');
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- 2. SCRIPT ĐIỀU KHIỂN CHUỘT GIF -->
+    <script>
+        (function() {
+            const cursor = document.getElementById('anime-cursor');
+            if (!cursor) return;
+            const cursorImg = cursor.querySelector('img');
+
+            function activateCursor() {
+                document.body.classList.add('has-custom-cursor');
+                cursor.style.display = 'block';
+            }
+
+            window.addEventListener('mousemove', (e) => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+            });
+
+            if (cursorImg) {
+                if (cursorImg.complete && cursorImg.naturalWidth !== 0) {
+                    activateCursor();
+                } else {
+                    cursorImg.addEventListener('load', activateCursor);
+                    cursorImg.addEventListener('error', () => {
+                        cursor.style.display = 'none';
+                        document.body.classList.remove('has-custom-cursor');
+                    });
+                }
+            }
+
+            document.addEventListener('mouseover', (e) => {
+                const isHoverTarget = e.target.closest('a, button, input, select, .view-btn, .anime-card-v2, .anime-table tbody tr, .poster-container');
+                if (isHoverTarget) {
+                    cursor.classList.add('cursor-hover');
+                } else {
+                    cursor.classList.remove('cursor-hover');
+                }
+            });
+
+            document.addEventListener('mouseleave', () => {
+                cursor.style.display = 'none';
+            });
+            document.addEventListener('mouseenter', () => {
+                if (document.body.classList.contains('has-custom-cursor')) {
+                    cursor.style.display = 'block';
+                }
+            });
+        })();
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

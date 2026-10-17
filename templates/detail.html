@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ anime.title_ro }}{% endblock %}
+
+{% block content %}
+<style>
+    .anime-backdrop {
+        position: relative;
+        min-height: 85vh;
+        padding: 50px 0;
+        overflow: hidden;
+    }
+    .backdrop-image {
+        position: absolute;
+        inset: 0;
+        background-image: url('{{ anime.poster_url }}');
+        background-size: cover;
+        background-position: center;
+        filter: blur(45px) brightness(0.25);
+        transform: scale(1.15);
+        z-index: 0;
+    }
+    .backdrop-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(11,13,20,0.7) 0%, #0b0d14 100%);
+        z-index: 1;
+    }
+    .detail-body {
+        position: relative;
+        z-index: 2;
+    }
+    .detail-poster-img {
+        width: 100%;
+        max-width: 320px;
+        border-radius: 16px;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.85);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+    .btn-download-sub {
+        background: var(--anime-gradient);
+        border: none;
+        color: #fff;
+        font-weight: 700;
+        padding: 14px;
+        border-radius: 12px;
+        transition: all 0.3s;
+        box-shadow: 0 10px 25px rgba(255, 42, 109, 0.35);
+    }
+    .btn-download-sub:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(255, 42, 109, 0.5);
+        color: #fff;
+    }
+    .btn-download-raw {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid var(--border-glass);
+        color: #fff;
+        font-weight: 700;
+        padding: 12px;
+        border-radius: 12px;
+        transition: all 0.3s;
+    }
+    .btn-download-raw:hover {
+        background: #10b981;
+        border-color: #10b981;
+        color: #fff;
+        transform: translateY(-3px);
+    }
+    .meta-box {
+        background: var(--bg-card);
+        border: 1px solid var(--border-glass);
+        border-radius: 14px;
+        padding: 20px;
+    }
+    .note-box-v2 {
+        background: rgba(255, 193, 7, 0.08);
+        border: 1px solid rgba(255, 193, 7, 0.25);
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 20px;
+        width: 100%;
+        max-width: 320px;
+    }
+
+    /* --- KHU VỰC CÙNG LOẠT PHIM --- */
+    /* ẨN TOÀN BỘ THANH CUỘN DƯỚI ĐÁY */
+    .related-scroll-box {
+        display: flex;
+        gap: 18px;
+        overflow-x: auto;
+        padding: 15px 5px 20px;
+        scroll-behavior: smooth;
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;     /* Firefox */
+    }
+    .related-scroll-box::-webkit-scrollbar {
+        display: none;             /* Chrome, Safari, Opera */
+    }
+
+    /* 2 NÚT MŨI TÊN ĐIỀU HƯỚNG SONG SONG */
+    .nav-arrow-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--border-glass);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+    .nav-arrow-btn:hover {
+        background: var(--anime-pink);
+        border-color: var(--anime-pink);
+        box-shadow: 0 0 15px rgba(255, 42, 109, 0.5);
+        transform: scale(1.08);
+        color: #fff;
+    }
+    .nav-arrow-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* THẺ PHIM LIÊN QUAN VÀ HIỆU ỨNG ZOOM */
+    .related-card {
+        min-width: 130px;
+        max-width: 130px;
+        text-decoration: none;
+        display: block;
+        transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        cursor: pointer;
+    }
+    .related-poster-box {
+        position: relative;
+        width: 100%;
+        height: 185px;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border-glass);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+        background: #111422;
+        transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .related-poster-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+    }
+    .related-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #e2e8f0;
+        margin-top: 8px;
+        line-height: 1.35;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        transition: color 0.25s ease;
+    }
+
+    .related-card:hover {
+        transform: translateY(-8px) scale(1.08);
+    }
+    .related-card:hover .related-poster-box {
+        border-color: var(--anime-pink);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9), 0 0 25px rgba(255, 42, 109, 0.5);
+    }
+    .related-card:hover .related-poster-box img {
+        transform: scale(1.12);
+    }
+    .related-card:hover .related-title {
+        color: var(--anime-pink) !important;
+    }
+</style>
+
+<div class="anime-backdrop">
+    <div class="backdrop-image"></div>
+    <div class="backdrop-overlay"></div>
+
+    <div class="container detail-body">
+        <div class="row g-5">
+            <!-- CỘT TRÁI: POSTER & NÚT DOWNLOAD & GHI CHÚ -->
+            <div class="col-md-5 col-lg-4 text-center d-flex flex-column align-items-center">
+                <img src="{{ anime.poster_url }}" alt="{{ anime.title_ro }}" class="detail-poster-img mb-4">
+                
+                <div class="d-flex flex-column gap-3 w-100" style="max-width: 320px;">
+                    {% if anime.sub_url %}
+                    <a href="{{ anime.sub_url }}" target="_blank" class="btn btn-download-sub text-uppercase">
+                        <i class="fas fa-cloud-arrow-down me-2 fa-lg"></i> TẢI XUỐNG PHỤ ĐỀ
+                    </a>
+                    {% else %}
+                    <button class="btn btn-secondary py-3 text-uppercase fw-bold disabled" style="border-radius: 12px;">
+                        Chưa có link Sub
+                    </button>
+                    {% endif %}
+
+                    {% if anime.raw_url %}
+                    <a href="{{ anime.raw_url }}" target="_blank" class="btn btn-download-raw text-uppercase">
+                        <i class="fas fa-file-video me-2"></i> TẢI RAW PHIM
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- HỘP GHI CHÚ NẾU CÓ -->
+                {% if anime.note %}
+                <div class="note-box-v2 text-start text-light">
+                    <h6 class="text-warning fw-bold border-bottom border-warning pb-2 mb-2" style="--bs-border-opacity: .3;">
+                        <i class="fas fa-sticky-note me-2"></i>Ghi chú
+                    </h6>
+                    <div class="small" style="line-height: 1.6; white-space: pre-line;">{{ anime.note }}</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- CỘT PHẢI: THÔNG TIN CHI TIẾT -->
+            <div class="col-md-7 col-lg-8">
+                <div class="d-flex gap-2 flex-wrap mb-2">
+                    <span class="badge bg-danger">{{ anime.status or "Completed" }}</span>
+                    <span class="badge bg-secondary">{{ anime.type }}</span>
+                    {% if anime.raw_type %}
+                    <span class="badge bg-info text-dark">{{ anime.raw_type }}</span>
+                    {% endif %}
+                </div>
+
+                <h1 class="fw-bold display-6 text-white mb-1">{{ anime.title_ro }}</h1>
+                <h5 class="text-secondary fst-italic mb-4">{{ anime.title_en }}</h5>
+
+                <div class="meta-box mb-4">
+                    <div class="row g-3">
+                        <div class="col-6 col-sm-4">
+                            <span class="text-secondary small d-block">Mùa phát hành</span>
+                            <span class="fw-bold text-white">{{ anime.year or "—" }}</span>
+                        </div>
+                        <div class="col-6 col-sm-4">
+                            <span class="text-secondary small d-block">Số tập</span>
+                            <span class="fw-bold text-white">{{ anime.episodes_sub }}/{{ anime.episodes }} Tập</span>
+                        </div>
+                        <div class="col-6 col-sm-4">
+                            <span class="text-secondary small d-block">Nhóm dịch (Fansub)</span>
+                            <span class="fw-bold text-info">{{ anime.fansub or "Chưa rõ" }}</span>
+                        </div>
+                        <div class="col-12 col-sm-8">
+                            <span class="text-secondary small d-block">Thể loại</span>
+                            <span class="fw-semibold text-light">{{ anime.genres or "Đang cập nhật" }}</span>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <span class="text-secondary small d-block">Loạt phim (Series)</span>
+                            <span class="fw-semibold text-warning">{{ anime.series or "Độc lập" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold text-white mb-2"><i class="fas fa-align-left text-danger me-2"></i>Tóm Tắt Nội Dung</h5>
+                <p class="text-light" style="line-height: 1.85; font-size: 1rem; color: #cbd5e1 !important;">
+                    {{ anime.summary or "Chưa có bản tóm tắt nội dung chính thức cho phim này." }}
+                </p>
+
+                <!-- CÙNG LOẠT PHIM (2 MŨI TÊN ĐIỀU HƯỚNG SONG SONG) -->
+                {% if related %}
+                <div class="mt-5">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="width: 4px; height: 22px; background: var(--anime-gradient); border-radius: 4px;"></div>
+                            <h5 class="fw-bold text-white m-0 text-uppercase">Cùng Loạt Phim</h5>
+                        </div>
+
+                        <!-- 2 NÚT MŨI TÊN NẰM SONG SONG -->
+                        <div class="d-flex gap-2">
+                            <button type="button" class="nav-arrow-btn" id="relatedScrollLeft" title="Cuộn sang trái">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button type="button" class="nav-arrow-btn" id="relatedScrollRight" title="Cuộn sang phải">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- DANH SÁCH CUỘN KHÔNG CÓ THANH CUỘN XẤU XÍ -->
+                    <div class="related-scroll-box" id="relatedScrollBox">
+                        {% for rel in related %}
+                        <a href="/anime/{{ rel.slug }}" class="related-card" title="{{ rel.title_ro }}">
+                            <div class="related-poster-box">
+                                <img src="{{ rel.poster_url }}" alt="{{ rel.title_ro }}" loading="lazy">
+                            </div>
+                            <div class="related-title">{{ rel.title_ro }}</div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const scrollBox = document.getElementById('relatedScrollBox');
+        const btnLeft = document.getElementById('relatedScrollLeft');
+        const btnRight = document.getElementById('relatedScrollRight');
+
+        if (scrollBox && btnLeft && btnRight) {
+            // Khoảng cách mỗi lần cuộn (bằng khoảng 2 thẻ phim)
+            const scrollStep = 300;
+
+            btnLeft.addEventListener('click', () => {
+                scrollBox.scrollBy({ left: -scrollStep, behavior: 'smooth' });
+            });
+
+            btnRight.addEventListener('click', () => {
+                scrollBox.scrollBy({ left: scrollStep, behavior: 'smooth' });
+            });
+
+            // Tự động mờ mũi tên nếu đã cuộn đến kịch biên trái hoặc phải
+            function updateArrowState() {
+                const maxScroll = scrollBox.scrollWidth - scrollBox.clientWidth;
+                
+                // Trạng thái nút trái
+                if (scrollBox.scrollLeft <= 5) {
+                    btnLeft.style.opacity = '0.35';
+                    btnLeft.style.pointerEvents = 'none';
+                } else {
+                    btnLeft.style.opacity = '1';
+                    btnLeft.style.pointerEvents = 'auto';
+                }
+
+                // Trạng thái nút phải
+                if (scrollBox.scrollLeft >= maxScroll - 5) {
+                    btnRight.style.opacity = '0.35';
+                    btnRight.style.pointerEvents = 'none';
+                } else {
+                    btnRight.style.opacity = '1';
+                    btnRight.style.pointerEvents = 'auto';
+                }
+            }
+
+            scrollBox.addEventListener('scroll', updateArrowState);
+            // Kiểm tra trạng thái ban đầu
+            updateArrowState();
+        }
+    });
+</script>
+{% endblock %}
