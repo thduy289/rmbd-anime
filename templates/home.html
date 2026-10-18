@@ -75,37 +75,7 @@
         margin-bottom: 20px;
     }
 
-    /* --- THANH TÁC VỤ GHIM TRONG SUỐT --- */
-    .sticky-action-zone {
-        position: sticky;
-        top: 62px;
-        z-index: 500;
-        background: transparent !important;
-        padding-top: 14px;
-        padding-bottom: 8px;
-        margin-bottom: 20px;
-    }
-    .glass-filter-card {
-        background: rgba(255, 255, 255, 0.03) !important;
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 14px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-    }
-    .glass-input {
-        background: rgba(255, 255, 255, 0.05) !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
-        color: #fff !important;
-    }
-    .glass-input:focus {
-        border-color: var(--anime-pink) !important;
-        box-shadow: 0 0 12px rgba(255, 42, 109, 0.3) !important;
-    }
-    .glass-input option {
-        background: #111422;
-        color: #fff;
-    }
+    /* --- NÚT CHUYỂN ĐỔI CHẾ ĐỘ VIEW --- */
     .view-btn {
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid var(--border-glass);
@@ -119,6 +89,35 @@
         color: #fff;
         border-color: var(--anime-pink);
         box-shadow: 0 0 15px rgba(255, 42, 109, 0.4);
+    }
+
+    /* --- KHUNG TÌM KIẾM & LỌC --- */
+    .filter-card-box {
+        position: sticky;
+        top: 68px;
+        z-index: 500;
+        background: rgba(18, 22, 38, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 14px;
+        padding: 14px 16px;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.65);
+        margin-bottom: 25px;
+    }
+    .filter-input-element, .search-icon-box {
+        background: rgba(11, 14, 24, 0.92) !important;
+        border: 1px solid rgba(255, 255, 255, 0.14) !important;
+        color: #fff !important;
+    }
+    .filter-input-element::placeholder {
+        color: #94a3b8 !important;
+    }
+    .filter-input-element:focus {
+        border-color: var(--anime-pink) !important;
+        box-shadow: 0 0 10px rgba(255, 42, 109, 0.35) !important;
+    }
+    .filter-input-element option {
+        background: #111422;
+        color: #fff;
     }
 
     /* --- BẢNG TABLE PHẲNG TRONG SUỐT --- */
@@ -265,53 +264,51 @@
     </div>
 </div>
 
-<!-- 3. PHẦN DANH SÁCH "DANH SÁCH PHỤ ĐỀ" -->
 <div class="container pb-5">
-    <div class="sticky-action-zone">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
-            <div class="d-flex align-items-center gap-2">
-                <div style="width: 5px; height: 26px; background: var(--anime-gradient); border-radius: 4px;"></div>
-                <h3 class="fw-bold m-0 text-white" style="letter-spacing: -0.5px;">DANH SÁCH PHỤ ĐỀ</h3>
-            </div>
-
-            <div class="d-flex align-items-center gap-2">
-                <span class="text-secondary small d-none d-sm-inline me-1">Hiển thị:</span>
-                <button id="btnGrid" class="view-btn active" title="Dạng Lưới (Grid)"><i class="fas fa-grip fa-lg"></i></button>
-                <button id="btnTable" class="view-btn" title="Dạng Bảng (Table)"><i class="fas fa-list-ul fa-lg"></i></button>
-            </div>
+    <!-- 3. TIÊU ĐỀ & 2 NÚT LƯỚI / BẢNG -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+        <div class="d-flex align-items-center gap-2">
+            <div style="width: 5px; height: 26px; background: var(--anime-gradient); border-radius: 4px;"></div>
+            <h3 class="fw-bold m-0 text-white" style="letter-spacing: -0.5px;">DANH SÁCH PHỤ ĐỀ</h3>
         </div>
 
-        <!-- KHUNG LỌC & TÌM KIẾM TRONG SUỐT -->
-        <div class="card p-3 mb-2 border-0 glass-filter-card">
-            <div class="row g-2">
-                <div class="col-12 col-md-4">
-                    <div class="input-group">
-                        <span class="input-group-text glass-input border-end-0 text-secondary"><i class="fas fa-search"></i></span>
-                        <input type="text" id="searchInput" class="form-control glass-input border-start-0" placeholder="Tìm tên phim (Romanji, English)...">
-                    </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="text-secondary small d-none d-sm-inline me-1">Hiển thị:</span>
+            <button id="btnGrid" class="view-btn active" title="Dạng Lưới (Grid)"><i class="fas fa-grip fa-lg"></i></button>
+            <button id="btnTable" class="view-btn" title="Dạng Bảng (Table)"><i class="fas fa-list-ul fa-lg"></i></button>
+        </div>
+    </div>
+
+    <!-- 4. KHUNG TÌM KIẾM 4 Ô -->
+    <div class="filter-card-box">
+        <div class="row g-2">
+            <div class="col-12 col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text search-icon-box border-end-0 text-secondary"><i class="fas fa-search"></i></span>
+                    <input type="text" id="searchInput" class="form-control filter-input-element border-start-0" placeholder="Tìm tên phim (Romanji, English)...">
                 </div>
-                <div class="col-6 col-md-3">
-                    <select id="seasonFilter" class="form-select glass-input">
-                        <option value="all">Tất cả Mùa / Năm</option>
-                        {% for s in seasons %}
-                        <option value="{{ s }}">{{ s }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-6 col-md-2">
-                    <select id="rawFilter" class="form-select glass-input">
-                        <option value="all">Tất cả Raw</option>
-                        <option value="bd">BD / BDRip</option>
-                        <option value="tv">TV / Web</option>
-                    </select>
-                </div>
-                <div class="col-12 col-md-3">
-                    <select id="sortFilter" class="form-select glass-input">
-                        <option value="az">Tên A-Z (Mặc định)</option>
-                        <option value="za">Tên Z-A</option>
-                        <option value="newest">Mới cập nhật</option>
-                    </select>
-                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <select id="seasonFilter" class="form-select filter-input-element">
+                    <option value="all">Tất cả Mùa / Năm</option>
+                    {% for s in seasons %}
+                    <option value="{{ s }}">{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6 col-md-2">
+                <select id="rawFilter" class="form-select filter-input-element">
+                    <option value="all">Tất cả Raw</option>
+                    <option value="bd">BD / BDRip</option>
+                    <option value="tv">TV / Web</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-3">
+                <select id="sortFilter" class="form-select filter-input-element">
+                    <option value="az">Tên A-Z (Mặc định)</option>
+                    <option value="za">Tên Z-A</option>
+                    <option value="newest">Mới cập nhật</option>
+                </select>
             </div>
         </div>
     </div>
@@ -345,7 +342,7 @@
         {% endfor %}
     </div>
 
-    <!-- DẠNG BẢNG (TABLE) -->
+    <!-- DẠNG BẢNG (TABLE - ĐÃ BỎ CỘT THAO TÁC, BẤM VÀO HÀNG ĐỂ XEM CHI TIẾT) -->
     <div id="tableView" class="table-responsive mb-5" style="display: none;">
         <table class="anime-table">
             <thead>
@@ -354,13 +351,13 @@
                     <th>Năm / Mùa</th>
                     <th>Số tập</th>
                     <th>Nhóm dịch</th>
-                    <th>Định dạng</th>
-                    <th class="text-end">Thao tác</th>
+                    <th class="text-end pe-4">Định dạng</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
                 {% for item in anime_list %}
                 <tr class="anime-table-item"
+                    onclick="window.location.href='/anime/{{ item.slug }}'"
                     data-title="{{ item.title_ro|lower }} {{ item.title_en|lower }}"
                     data-season="{{ item.year }}"
                     data-raw="{{ item.raw_type|lower }}"
@@ -381,17 +378,12 @@
                     <td><span class="badge bg-secondary-subtle text-light">{{ item.year }}</span></td>
                     <td><span class="text-light fw-semibold">{{ item.episodes_sub }}/{{ item.episodes }}</span></td>
                     <td><span class="text-info">{{ item.fansub or "—" }}</span></td>
-                    <td>
+                    <td class="text-end pe-4">
                         {% if 'bd' in item.raw_type|lower %}
                         <span class="badge bg-danger">BD / BDRip</span>
                         {% else %}
                         <span class="badge bg-secondary">TV / Web</span>
                         {% endif %}
-                    </td>
-                    <td class="text-end">
-                        <a href="/anime/{{ item.slug }}" class="btn btn-sm btn-outline-danger rounded-pill px-3">
-                            Xem <i class="fas fa-chevron-right ms-1"></i>
-                        </a>
                     </td>
                 </tr>
                 {% endfor %}
