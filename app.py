@@ -246,12 +246,14 @@ def home():
     valid_data = [x for x in data if x.get("sub_url") and x.get("is_public")]
     valid_data.sort(key=lambda x: x.get("last_edited", ""), reverse=True)
 
-    # Lấy 30 phim mới nhất
-    latest_30 = valid_data[:30]
-    slider_data = latest_30[:5]
+    # 1. 5 bộ mới nhất cho Slide
+    slider_data = valid_data[:5]
+
+    # 2. 30 bộ TIẾP THEO cho phần Mới cập nhật (từ bộ thứ 6 đến 35, không bị trùng Slide)
+    grid_anime = valid_data[5:35]
 
     return render_template(
-        "home.html", slider_data=slider_data, latest_anime=latest_30
+        "home.html", slider_data=slider_data, latest_anime=grid_anime
     )
 
 
