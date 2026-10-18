@@ -4,18 +4,17 @@
 
 {% block content %}
 <style>
-    /* --- VÙNG TÁC VỤ GHIM TRONG SUỐT (PURE GLASSMORPHISM) --- */
+    /* --- VÙNG TÁC VỤ GHIM TRONG SUỐT --- */
     .sticky-action-zone {
         position: sticky;
         top: 62px;
         z-index: 500;
-        background: transparent !important; /* XÓA BỎ NỀN ĐEN ĐẶC */
+        background: transparent !important;
         padding-top: 14px;
         padding-bottom: 8px;
         margin-bottom: 20px;
     }
 
-    /* KHUNG LỌC TRONG SUỐT, NHẸ NHÀNG ĐỂ LỘ NỀN CHUYỂN SẮC PHÍA SAU */
     .glass-filter-card {
         background: rgba(255, 255, 255, 0.03) !important;
         backdrop-filter: blur(20px);
@@ -25,7 +24,6 @@
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
     }
 
-    /* CÁC Ô NHẬP LIỆU & LỌC CŨNG TRONG SUỐT ĐỒNG BỘ */
     .glass-input {
         background: rgba(255, 255, 255, 0.05) !important;
         border: 1px solid rgba(255, 255, 255, 0.12) !important;
@@ -36,11 +34,10 @@
         box-shadow: 0 0 12px rgba(255, 42, 109, 0.3) !important;
     }
     .glass-input option {
-        background: #111422; /* Màu menu xổ xuống */
+        background: #111422;
         color: #fff;
     }
 
-    /* NÚT CHUYỂN ĐỔI CHẾ ĐỘ VIEW */
     .view-btn {
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid var(--border-glass);
@@ -56,7 +53,7 @@
         box-shadow: 0 0 15px rgba(255, 42, 109, 0.4);
     }
 
-    /* --- BẢNG TABLE VỚI HIỆU ỨNG ZOOM NGUYÊN HÀNG --- */
+    /* --- BẢNG TABLE: KHỐI THẺ BO GÓC LIỀN MẠCH, KHÔNG CÓ VẠCH CHIA CỘT --- */
     .anime-table {
         width: 100%;
         border-collapse: separate;
@@ -72,48 +69,67 @@
     }
 
     .anime-table tbody tr {
-        background: var(--bg-card);
-        border-radius: 14px;
+        background: transparent !important;
         position: relative;
         cursor: pointer;
-        transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), 
-                    box-shadow 0.28s ease, 
-                    background 0.28s ease;
+        /* Nhấc bổng nhẹ và đổ bóng nguyên khối */
+        transition: transform 0.25s ease, filter 0.25s ease;
     }
 
+    /* KHI HOVER: Đổ bóng mượt mà bao quanh mép ngoài, KHÔNG tạo vạch chia bên trong */
     .anime-table tbody tr:hover {
-        background: var(--bg-card-hover);
-        transform: translateY(-5px) scale(1.02);
-        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(255, 42, 109, 0.25);
+        transform: translateY(-4px);
+        filter: drop-shadow(0 14px 25px rgba(0, 0, 0, 0.75));
         z-index: 100;
     }
 
-    .anime-table td {
+    /* CÁC Ô TRONG DÒNG: KHÓA BỎ HOÀN TOÀN VIỀN TRÁI/PHẢI VÀ BOX-SHADOW */
+    .anime-table tbody tr td {
+        background: rgba(22, 27, 46, 0.65);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         padding: 14px 20px;
         vertical-align: middle;
         border-top: 1px solid var(--border-glass);
         border-bottom: 1px solid var(--border-glass);
-        transition: border-color 0.28s ease, color 0.2s ease;
+        border-left: none !important;
+        border-right: none !important;
+        box-shadow: none !important; /* TRIỆT TIÊU TOÀN BỘ CÁC VỆT GẠCH CHIA CỘT */
+        transition: background 0.25s ease, border-color 0.25s ease;
     }
-    .anime-table td:first-child { 
-        border-left: 1px solid var(--border-glass);
+
+    /* CHỈ Ô ĐẦU TIÊN MỚI CÓ VIỀN TRÁI VÀ BO GÓC TRÁI */
+    .anime-table tbody tr td:first-child { 
+        border-left: 1px solid var(--border-glass) !important;
         border-radius: 14px 0 0 14px; 
     }
-    .anime-table td:last-child { 
-        border-right: 1px solid var(--border-glass);
+
+    /* CHỈ Ô CUỐI CÙNG MỚI CÓ VIỀN PHẢI VÀ BO GÓC PHẢI */
+    .anime-table tbody tr td:last-child { 
+        border-right: 1px solid var(--border-glass) !important;
         border-radius: 0 14px 14px 0; 
     }
 
+    /* KHI HOVER: ĐỔI MÀU NỀN VÀ VIỀN KHUNG NGOÀI (CÁC Ô LIỀN NHAU 100%) */
     .anime-table tbody tr:hover td {
-        border-color: rgba(255, 42, 109, 0.35);
+        background: rgba(30, 37, 63, 0.95);
+        border-top-color: rgba(255, 42, 109, 0.4);
+        border-bottom-color: rgba(255, 42, 109, 0.4);
+        border-left: none !important;
+        border-right: none !important;
+        box-shadow: none !important;
     }
     .anime-table tbody tr:hover td:first-child {
-        border-left: 4px solid var(--anime-pink);
+        border-left: 4px solid var(--anime-pink) !important;
+    }
+    .anime-table tbody tr:hover td:last-child {
+        border-right: 1px solid rgba(255, 42, 109, 0.4) !important;
     }
     .anime-table tbody tr:hover .anime-row-title {
         color: var(--anime-pink) !important;
     }
 
+    /* THUMBNAIL PHÓNG TO KHI RÊ VÀO ẢNH */
     .table-thumb-wrapper {
         position: relative;
         margin-right: 14px;
@@ -129,13 +145,10 @@
         transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.28s ease, border-color 0.2s ease;
         border: 1px solid rgba(255, 255, 255, 0.12);
     }
-
     .anime-table tbody tr:hover .table-thumb {
-        transform: scale(1.1);
+        transform: scale(1.08);
         border-color: var(--anime-pink);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7), 0 0 15px rgba(255, 42, 109, 0.4);
     }
-
     .table-thumb-wrapper:hover .table-thumb {
         transform: scale(2.4) !important;
         transform-origin: left center;
@@ -152,10 +165,10 @@
 
 <div class="container pb-5">
     <!-- ================================================================= -->
-    <!-- PHẦN TÁC VỤ GHIM TRONG SUỐT (GIỮ TRỌN VẸN NỀN CHUYỂN SẮC) -->
+    <!-- PHẦN TÁC VỤ GHIM TRONG SUỐT -->
     <!-- ================================================================= -->
     <div class="sticky-action-zone">
-        <!-- 1. TIÊU ĐỀ & NÚT CHUYỂN ĐỔI (VỊ TRÍ NGUYÊN BẢN) -->
+        <!-- 1. TIÊU ĐỀ & NÚT CHUYỂN ĐỔI -->
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
             <div>
                 <div class="d-flex align-items-center gap-2">
@@ -236,7 +249,7 @@
         {% endfor %}
     </div>
 
-    <!-- 2. GIAO DIỆN BẢNG (TABLE - ZOOM NGUYÊN HÀNG) -->
+    <!-- 2. GIAO DIỆN BẢNG (TABLE - LIỀN MẠCH, KHÔNG VẠCH CHIA CỘT) -->
     <div id="tableView" class="table-responsive mb-5" style="display: none;">
         <table class="anime-table">
             <thead>
