@@ -7,7 +7,7 @@
     .hero-banner-section {
         position: relative;
         background: #000;
-        margin-bottom: 40px;
+        margin-bottom: 35px;
     }
     .hero-swiper {
         height: 520px;
@@ -76,7 +76,20 @@
     }
 </style>
 
-<!-- HERO SPOTLIGHT -->
+<!-- 1. TIÊU ĐỀ "MỚI CẬP NHẬT" ĐƯỢC ĐƯA LÊN TRÊN ĐẦU SLIDE -->
+<div class="container pt-4 pb-2">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+            <div style="width: 5px; height: 26px; background: var(--anime-gradient); border-radius: 4px;"></div>
+            <h3 class="fw-bold m-0 text-white" style="letter-spacing: -0.5px;">MỚI CẬP NHẬT</h3>
+        </div>
+        <a href="/list" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+            Xem Tất Cả <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+    </div>
+</div>
+
+<!-- 2. SLIDE 5 BỘ MỚI NHẤT -->
 <div class="hero-banner-section">
     <div class="swiper hero-swiper">
         <div class="swiper-wrapper">
@@ -92,7 +105,7 @@
                             </a>
                         </div>
                         <div class="col-md-8 col-lg-9 ps-md-4">
-                            <span class="hero-tag"><i class="fas fa-sparkles me-1"></i> MỚI CẬP NHẬT</span>
+                            <span class="hero-tag"><i class="fas fa-sparkles me-1"></i> TIÊU ĐIỂM</span>
                             <h1 class="hero-title text-truncate">{{ item.title_ro }}</h1>
                             <div class="text-secondary fst-italic mb-3">{{ item.title_en }}</div>
                             <div class="d-flex flex-wrap gap-3 mb-3 small text-light fw-semibold">
@@ -117,18 +130,8 @@
     </div>
 </div>
 
-<!-- LƯỚI PHIM MỚI NHẤT -->
+<!-- 3. LƯỚI 30 BỘ TIẾP THEO -->
 <div class="container pb-5">
-    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-        <div class="d-flex align-items-center gap-2">
-            <div style="width: 5px; height: 26px; background: var(--anime-gradient); border-radius: 4px;"></div>
-            <h3 class="fw-bold m-0 text-white" style="letter-spacing: -0.5px;">MỚI CẬP NHẬT</h3>
-        </div>
-        <a href="/list" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
-            Xem Tất Cả <i class="fas fa-arrow-right ms-1"></i>
-        </a>
-    </div>
-
     <div class="anime-responsive-grid">
         {% for item in latest_anime %}
         <a href="/anime/{{ item.slug }}" class="anime-card-link">
@@ -150,6 +153,13 @@
             </div>
         </a>
         {% endfor %}
+    </div>
+
+    <!-- Nút xem thêm ở cuối danh sách 30 phim -->
+    <div class="text-center mt-5">
+        <a href="/list" class="btn btn-outline-danger px-4 py-2 rounded-pill fw-bold" style="border-color: var(--anime-pink); color: #fff;">
+            Xem Thêm Nhiều Phim Khác Trong Danh Sách <i class="fas fa-arrow-right ms-2"></i>
+        </a>
     </div>
 </div>
 {% endblock %}
