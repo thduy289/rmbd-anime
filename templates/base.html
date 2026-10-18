@@ -336,28 +336,23 @@
                 <i class="fas fa-bars-staggered fa-lg"></i>
             </button>
             <div class="collapse navbar-collapse" id="navAnime">
-                <ul class="navbar-nav ms-auto align-items-center gap-1 mt-3 mt-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link-anime {{ 'active' if request.path == '/' else '' }}" href="/">
-                            <i class="fas fa-fire me-1"></i> Trang Chủ
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link-anime {{ 'active' if request.path == '/list' else '' }}" href="/list">
-                            <i class="fas fa-layer-group me-1"></i> Danh Sách
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link-anime {{ 'active' if request.path == '/random' else '' }}" href="/random">
-                            <i class="fas fa-dice me-1" style="color: #ff2a6d;"></i> Hôm Nay Xem Gì?
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link-anime {{ 'active' if request.path == '/chat' else '' }}" href="/chat">
-                            <i class="fab fa-discord me-1" style="color: #5865F2;"></i> Chat
-                        </a>
-                    </li>
-                </ul>
+				<ul class="navbar-nav ms-auto align-items-center gap-1 mt-3 mt-lg-0">
+					<li class="nav-item">
+						<a class="nav-link-anime {{ 'active' if request.path in ['/', '/list'] else '' }}" href="/">
+							<i class="fas fa-closed-captioning me-1"></i> Phụ Đề
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link-anime {{ 'active' if request.path == '/random' else '' }}" href="/random">
+							<i class="fas fa-dice me-1" style="color: #ff2a6d;"></i> Hôm Nay Xem Gì?
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link-anime {{ 'active' if request.path == '/chat' else '' }}" href="/chat">
+							<i class="fab fa-discord me-1" style="color: #5865F2;"></i> Chat
+						</a>
+					</li>
+				</ul>
             </div>
         </div>
     </nav>
