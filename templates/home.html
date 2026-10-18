@@ -1,16 +1,25 @@
 {% extends 'base.html' %}
 
-{% block title %}Trang Chủ{% endblock %}
+{% block title %}Phụ Đề Anime - RMBD{% endblock %}
 
 {% block content %}
 <style>
+    /* --- KHUNG HERO SLIDE DẠNG KÍNH MỜ BO GÓC --- */
+    .hero-banner-wrapper {
+        margin-bottom: 25px;
+    }
     .hero-banner-section {
         position: relative;
-        background: #000;
-        margin-bottom: 35px;
+        background: rgba(22, 27, 46, 0.35);
+        border: 1px solid var(--border-glass);
+        border-radius: 20px;
+        overflow: hidden;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
     }
     .hero-swiper {
-        height: 520px;
+        height: 500px;
         width: 100%;
     }
     .hero-slide {
@@ -24,40 +33,31 @@
         inset: 0;
         background-size: cover;
         background-position: center;
-        filter: blur(35px) brightness(0.35);
+        filter: blur(35px) brightness(0.45);
+        opacity: 0.45;
         transform: scale(1.15);
     }
     .hero-overlay {
         position: absolute;
         inset: 0;
-        background: linear-gradient(90deg, #0b0d14 0%, rgba(11,13,20,0.85) 45%, transparent 100%),
-                    linear-gradient(0deg, #0b0d14 0%, transparent 50%);
+        background: linear-gradient(90deg, rgba(11, 13, 20, 0.75) 0%, rgba(11, 13, 20, 0.35) 55%, transparent 100%),
+                    linear-gradient(0deg, rgba(11, 13, 20, 0.5) 0%, transparent 50%);
     }
     .hero-content {
         position: relative;
         z-index: 2;
+        padding: 0 25px;
     }
     .hero-poster {
-        width: 250px;
-        height: 360px;
+        width: 235px;
+        height: 340px;
         border-radius: 14px;
         object-fit: cover;
         box-shadow: 0 20px 45px rgba(0,0,0,0.85);
-        border: 1px solid rgba(255,255,255,0.15);
-    }
-    .hero-tag {
-        background: var(--anime-gradient);
-        color: #fff;
-        font-weight: 800;
-        font-size: 0.75rem;
-        padding: 5px 12px;
-        border-radius: 50px;
-        display: inline-block;
-        margin-bottom: 12px;
-        letter-spacing: 1px;
+        border: 1px solid rgba(255,255,255,0.18);
     }
     .hero-title {
-        font-size: 2.3rem;
+        font-size: 2.2rem;
         font-weight: 800;
         line-height: 1.2;
         margin-bottom: 8px;
@@ -74,67 +74,257 @@
         max-width: 650px;
         margin-bottom: 20px;
     }
+
+    /* --- THANH TÁC VỤ GHIM TRONG SUỐT --- */
+    .sticky-action-zone {
+        position: sticky;
+        top: 62px;
+        z-index: 500;
+        background: transparent !important;
+        padding-top: 14px;
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+    }
+    .glass-filter-card {
+        background: rgba(255, 255, 255, 0.03) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 14px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    .glass-input {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        color: #fff !important;
+    }
+    .glass-input:focus {
+        border-color: var(--anime-pink) !important;
+        box-shadow: 0 0 12px rgba(255, 42, 109, 0.3) !important;
+    }
+    .glass-input option {
+        background: #111422;
+        color: #fff;
+    }
+    .view-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-glass);
+        color: var(--text-muted);
+        padding: 8px 14px;
+        border-radius: 8px;
+        transition: all 0.25s ease;
+    }
+    .view-btn.active, .view-btn:hover {
+        background: var(--anime-pink);
+        color: #fff;
+        border-color: var(--anime-pink);
+        box-shadow: 0 0 15px rgba(255, 42, 109, 0.4);
+    }
+
+    /* --- BẢNG TABLE PHẲNG TRONG SUỐT --- */
+    .anime-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 12px;
+    }
+    .anime-table thead th {
+        color: var(--text-muted);
+        font-weight: 700;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        border: none;
+        padding: 12px 20px;
+    }
+    .anime-table tbody tr {
+        background: transparent !important;
+        position: relative;
+        cursor: pointer;
+        transition: transform 0.25s ease, filter 0.25s ease;
+    }
+    .anime-table tbody tr:hover {
+        transform: translateY(-4px);
+        filter: drop-shadow(0 14px 25px rgba(0, 0, 0, 0.75));
+        z-index: 100;
+    }
+    .anime-table tbody tr td {
+        background: rgba(22, 27, 46, 0.65);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 14px 20px;
+        vertical-align: middle;
+        border-top: 1px solid var(--border-glass);
+        border-bottom: 1px solid var(--border-glass);
+        border-left: none !important;
+        border-right: none !important;
+        box-shadow: none !important;
+        transition: background 0.25s ease, border-color 0.25s ease;
+    }
+    .anime-table tbody tr td:first-child { 
+        border-left: 1px solid var(--border-glass) !important;
+        border-radius: 14px 0 0 14px; 
+    }
+    .anime-table tbody tr td:last-child { 
+        border-right: 1px solid var(--border-glass) !important;
+        border-radius: 0 14px 14px 0; 
+    }
+    .anime-table tbody tr:hover td {
+        background: rgba(30, 37, 63, 0.95);
+        border-top-color: rgba(255, 42, 109, 0.4);
+        border-bottom-color: rgba(255, 42, 109, 0.4);
+    }
+    .anime-table tbody tr:hover td:first-child {
+        border-left: 4px solid var(--anime-pink) !important;
+    }
+    .anime-table tbody tr:hover td:last-child {
+        border-right: 1px solid rgba(255, 42, 109, 0.4) !important;
+    }
+    .anime-table tbody tr:hover .anime-row-title {
+        color: var(--anime-pink) !important;
+    }
+
+    .table-thumb-wrapper {
+        position: relative;
+        margin-right: 14px;
+        flex-shrink: 0;
+        z-index: 1;
+    }
+    .table-thumb {
+        width: 50px;
+        height: 72px;
+        object-fit: cover;
+        border-radius: 8px;
+        display: block;
+        transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.2s ease;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .anime-table tbody tr:hover .table-thumb {
+        transform: scale(1.08);
+        border-color: var(--anime-pink);
+    }
+    .table-thumb-wrapper:hover .table-thumb {
+        transform: scale(2.4) !important;
+        transform-origin: left center;
+        z-index: 9999;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.98), 0 0 30px rgba(255, 42, 109, 0.7) !important;
+    }
+
+    @media (min-width: 768px) {
+        #tableView {
+            overflow: visible !important;
+        }
+    }
 </style>
 
-<!-- 1. TIÊU ĐỀ "MỚI CẬP NHẬT" ĐƯỢC ĐƯA LÊN TRÊN ĐẦU SLIDE -->
+<!-- 1. ĐẦU TRANG: TIÊU ĐỀ "MỚI CẬP NHẬT" -->
 <div class="container pt-4 pb-2">
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-        <div class="d-flex align-items-center gap-2">
-            <div style="width: 5px; height: 26px; background: var(--anime-gradient); border-radius: 4px;"></div>
-            <h3 class="fw-bold m-0 text-white" style="letter-spacing: -0.5px;">MỚI CẬP NHẬT</h3>
-        </div>
-        <a href="/list" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
-            Xem Tất Cả <i class="fas fa-arrow-right ms-1"></i>
-        </a>
+    <div class="d-flex align-items-center gap-2">
+        <div style="width: 5px; height: 26px; background: var(--anime-gradient); border-radius: 4px;"></div>
+        <h3 class="fw-bold m-0 text-white" style="letter-spacing: -0.5px;">MỚI CẬP NHẬT</h3>
     </div>
 </div>
 
-<!-- 2. SLIDE 5 BỘ MỚI NHẤT -->
-<div class="hero-banner-section">
-    <div class="swiper hero-swiper">
-        <div class="swiper-wrapper">
-            {% for item in slider_data %}
-            <div class="swiper-slide hero-slide">
-                <div class="hero-bg-blur" style="background-image: url('{{ item.poster_url }}');"></div>
-                <div class="hero-overlay"></div>
-                <div class="container hero-content py-5">
-                    <div class="row align-items-center">
-                        <div class="col-md-4 col-lg-3 d-none d-md-block text-center">
-                            <a href="/anime/{{ item.slug }}">
-                                <img src="{{ item.poster_url }}" class="hero-poster" alt="{{ item.title_ro }}">
-                            </a>
-                        </div>
-                        <div class="col-md-8 col-lg-9 ps-md-4">
-                            <span class="hero-tag"><i class="fas fa-sparkles me-1"></i> TIÊU ĐIỂM</span>
-                            <h1 class="hero-title text-truncate">{{ item.title_ro }}</h1>
-                            <div class="text-secondary fst-italic mb-3">{{ item.title_en }}</div>
-                            <div class="d-flex flex-wrap gap-3 mb-3 small text-light fw-semibold">
-                                <span><i class="fas fa-calendar text-danger me-1"></i> {{ item.year }}</span>
-                                <span><i class="fas fa-tv text-primary me-1"></i> {{ item.type }}</span>
-                                <span><i class="fas fa-layer-group text-warning me-1"></i> {{ item.episodes_sub }}/{{ item.episodes }} Tập</span>
-                                {% if item.raw_type %}
-                                <span><i class="fas fa-compact-disc text-info me-1"></i> {{ item.raw_type }}</span>
-                                {% endif %}
+<!-- 2. SLIDE 10 BỘ MỚI NHẤT -->
+<div class="container hero-banner-wrapper">
+    <div class="hero-banner-section">
+        <div class="swiper hero-swiper">
+            <div class="swiper-wrapper">
+                {% for item in slider_data %}
+                <div class="swiper-slide hero-slide">
+                    <div class="hero-bg-blur" style="background-image: url('{{ item.poster_url }}');"></div>
+                    <div class="hero-overlay"></div>
+                    <div class="container hero-content py-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-4 col-lg-3 d-none d-md-block text-center">
+                                <a href="/anime/{{ item.slug }}">
+                                    <img src="{{ item.poster_url }}" class="hero-poster" alt="{{ item.title_ro }}">
+                                </a>
                             </div>
-                            <p class="hero-desc">{{ item.summary or "Chưa có nội dung tóm tắt cho phim này." }}</p>
-                            <a href="/anime/{{ item.slug }}" class="btn btn-danger px-4 py-2 fw-bold rounded-pill" style="background: var(--anime-gradient); border: none;">
-                                <i class="fas fa-play me-2"></i> Xem Chi Tiết
-                            </a>
+                            <div class="col-md-8 col-lg-9 ps-md-4">
+                                <h1 class="hero-title text-truncate">{{ item.title_ro }}</h1>
+                                <div class="text-secondary fst-italic mb-3">{{ item.title_en }}</div>
+                                <div class="d-flex flex-wrap gap-3 mb-3 small text-light fw-semibold">
+                                    <span><i class="fas fa-calendar text-danger me-1"></i> {{ item.year }}</span>
+                                    <span><i class="fas fa-tv text-primary me-1"></i> {{ item.type }}</span>
+                                    <span><i class="fas fa-layer-group text-warning me-1"></i> {{ item.episodes_sub }}/{{ item.episodes }} Tập</span>
+                                    {% if item.raw_type %}
+                                    <span><i class="fas fa-compact-disc text-info me-1"></i> {{ item.raw_type }}</span>
+                                    {% endif %}
+                                </div>
+                                <p class="hero-desc">{{ item.summary or "Chưa có nội dung tóm tắt cho phim này." }}</p>
+                                <a href="/anime/{{ item.slug }}" class="btn btn-danger px-4 py-2 fw-bold rounded-pill" style="background: var(--anime-gradient); border: none;">
+                                    <i class="fas fa-play me-2"></i> Xem Chi Tiết
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+            <div class="swiper-pagination"></div>
         </div>
-        <div class="swiper-pagination"></div>
     </div>
 </div>
 
-<!-- 3. LƯỚI 30 BỘ TIẾP THEO -->
+<!-- 3. PHẦN DANH SÁCH "DANH SÁCH PHỤ ĐỀ" -->
 <div class="container pb-5">
-    <div class="anime-responsive-grid">
-        {% for item in latest_anime %}
-        <a href="/anime/{{ item.slug }}" class="anime-card-link">
+    <div class="sticky-action-zone">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+            <div class="d-flex align-items-center gap-2">
+                <div style="width: 5px; height: 26px; background: var(--anime-gradient); border-radius: 4px;"></div>
+                <h3 class="fw-bold m-0 text-white" style="letter-spacing: -0.5px;">DANH SÁCH PHỤ ĐỀ</h3>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <span class="text-secondary small d-none d-sm-inline me-1">Hiển thị:</span>
+                <button id="btnGrid" class="view-btn active" title="Dạng Lưới (Grid)"><i class="fas fa-grip fa-lg"></i></button>
+                <button id="btnTable" class="view-btn" title="Dạng Bảng (Table)"><i class="fas fa-list-ul fa-lg"></i></button>
+            </div>
+        </div>
+
+        <!-- KHUNG LỌC & TÌM KIẾM TRONG SUỐT -->
+        <div class="card p-3 mb-2 border-0 glass-filter-card">
+            <div class="row g-2">
+                <div class="col-12 col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text glass-input border-end-0 text-secondary"><i class="fas fa-search"></i></span>
+                        <input type="text" id="searchInput" class="form-control glass-input border-start-0" placeholder="Tìm tên phim (Romanji, English)...">
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <select id="seasonFilter" class="form-select glass-input">
+                        <option value="all">Tất cả Mùa / Năm</option>
+                        {% for s in seasons %}
+                        <option value="{{ s }}">{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <select id="rawFilter" class="form-select glass-input">
+                        <option value="all">Tất cả Raw</option>
+                        <option value="bd">BD / BDRip</option>
+                        <option value="tv">TV / Web</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <select id="sortFilter" class="form-select glass-input">
+                        <option value="az">Tên A-Z (Mặc định)</option>
+                        <option value="za">Tên Z-A</option>
+                        <option value="newest">Mới cập nhật</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DẠNG LƯỚI (GRID) -->
+    <div id="gridView" class="anime-responsive-grid mb-5">
+        {% for item in anime_list %}
+        <a href="/anime/{{ item.slug }}" 
+           class="anime-card-link anime-grid-item"
+           data-title="{{ item.title_ro|lower }} {{ item.title_en|lower }}"
+           data-season="{{ item.year }}"
+           data-raw="{{ item.raw_type|lower }}"
+           data-updated="{{ item.last_edited }}">
             <div class="anime-card-v2">
                 <div class="poster-container">
                     <img src="{{ item.poster_url }}" alt="{{ item.title_ro }}" loading="lazy">
@@ -155,11 +345,65 @@
         {% endfor %}
     </div>
 
-    <!-- Nút xem thêm ở cuối danh sách 30 phim -->
-    <div class="text-center mt-5">
-        <a href="/list" class="btn btn-outline-danger px-4 py-2 rounded-pill fw-bold" style="border-color: var(--anime-pink); color: #fff;">
-            Xem Thêm Nhiều Phim Khác Trong Danh Sách <i class="fas fa-arrow-right ms-2"></i>
-        </a>
+    <!-- DẠNG BẢNG (TABLE) -->
+    <div id="tableView" class="table-responsive mb-5" style="display: none;">
+        <table class="anime-table">
+            <thead>
+                <tr>
+                    <th>Anime</th>
+                    <th>Năm / Mùa</th>
+                    <th>Số tập</th>
+                    <th>Nhóm dịch</th>
+                    <th>Định dạng</th>
+                    <th class="text-end">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                {% for item in anime_list %}
+                <tr class="anime-table-item"
+                    data-title="{{ item.title_ro|lower }} {{ item.title_en|lower }}"
+                    data-season="{{ item.year }}"
+                    data-raw="{{ item.raw_type|lower }}"
+                    data-updated="{{ item.last_edited }}">
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="table-thumb-wrapper">
+                                <img src="{{ item.poster_url }}" class="table-thumb" alt="{{ item.title_ro }}" loading="lazy">
+                            </div>
+                            <div>
+                                <a href="/anime/{{ item.slug }}" class="fw-bold text-white text-decoration-none d-block anime-row-title">
+                                    {{ item.title_ro }}
+                                </a>
+                                <small class="text-secondary fst-italic">{{ item.title_en }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge bg-secondary-subtle text-light">{{ item.year }}</span></td>
+                    <td><span class="text-light fw-semibold">{{ item.episodes_sub }}/{{ item.episodes }}</span></td>
+                    <td><span class="text-info">{{ item.fansub or "—" }}</span></td>
+                    <td>
+                        {% if 'bd' in item.raw_type|lower %}
+                        <span class="badge bg-danger">BD / BDRip</span>
+                        {% else %}
+                        <span class="badge bg-secondary">TV / Web</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <a href="/anime/{{ item.slug }}" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                            Xem <i class="fas fa-chevron-right ms-1"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- THÔNG BÁO KHÔNG TÌM THẤY KẾT QUẢ -->
+    <div id="noMatchAlert" class="alert alert-dark text-center py-5 border-secondary" style="display: none; background: rgba(22, 27, 46, 0.4); border-radius: 14px;">
+        <i class="fas fa-box-open fa-3x text-secondary mb-3"></i>
+        <h5>Không tìm thấy anime phù hợp!</h5>
+        <p class="text-secondary small mb-0">Vui lòng thử tìm với từ khóa hoặc bộ lọc khác.</p>
     </div>
 </div>
 {% endblock %}
@@ -171,6 +415,105 @@
         autoplay: { delay: 4500, disableOnInteraction: false },
         speed: 800,
         pagination: { el: ".swiper-pagination", clickable: true },
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const btnGrid = document.getElementById("btnGrid");
+        const btnTable = document.getElementById("btnTable");
+        const gridView = document.getElementById("gridView");
+        const tableView = document.getElementById("tableView");
+
+        const searchInput = document.getElementById("searchInput");
+        const seasonFilter = document.getElementById("seasonFilter");
+        const rawFilter = document.getElementById("rawFilter");
+        const sortFilter = document.getElementById("sortFilter");
+        const noMatchAlert = document.getElementById("noMatchAlert");
+
+        function setView(view) {
+            if (view === 'table') {
+                btnTable.classList.add('active');
+                btnGrid.classList.remove('active');
+                gridView.style.display = 'none';
+                tableView.style.display = 'block';
+                localStorage.setItem('anime_view_mode', 'table');
+            } else {
+                btnGrid.classList.add('active');
+                btnTable.classList.remove('active');
+                gridView.style.display = 'grid';
+                tableView.style.display = 'none';
+                localStorage.setItem('anime_view_mode', 'grid');
+            }
+        }
+
+        btnGrid.addEventListener("click", () => setView('grid'));
+        btnTable.addEventListener("click", () => setView('table'));
+
+        const savedView = localStorage.getItem('anime_view_mode') || 'grid';
+        setView(savedView);
+
+        const gridItems = Array.from(document.querySelectorAll('.anime-grid-item'));
+        const tableItems = Array.from(document.querySelectorAll('.anime-table-item'));
+
+        function applyFilter() {
+            const query = searchInput.value.toLowerCase().trim();
+            const season = seasonFilter.value;
+            const raw = rawFilter.value;
+
+            let visibleCount = 0;
+
+            function checkMatch(el) {
+                const title = el.dataset.title || "";
+                const itemSeason = el.dataset.season || "";
+                const itemRaw = el.dataset.raw || "";
+
+                const matchSearch = query === "" || title.includes(query);
+                const matchSeason = season === "all" || itemSeason === season;
+                let matchRaw = true;
+                if (raw === "bd") matchRaw = itemRaw.includes("bd");
+                if (raw === "tv") matchRaw = !itemRaw.includes("bd");
+
+                return matchSearch && matchSeason && matchRaw;
+            }
+
+            gridItems.forEach(item => {
+                const isMatch = checkMatch(item);
+                item.style.display = isMatch ? 'block' : 'none';
+                if (isMatch) visibleCount++;
+            });
+
+            tableItems.forEach(item => {
+                const isMatch = checkMatch(item);
+                item.style.display = isMatch ? 'table-row' : 'none';
+            });
+
+            noMatchAlert.style.display = visibleCount === 0 ? "block" : "none";
+        }
+
+        searchInput.addEventListener("input", applyFilter);
+        seasonFilter.addEventListener("change", applyFilter);
+        rawFilter.addEventListener("change", applyFilter);
+
+        sortFilter.addEventListener("change", function () {
+            const mode = this.value;
+
+            function sortElements(container, items) {
+                items.sort((a, b) => {
+                    const titleA = a.dataset.title || "";
+                    const titleB = b.dataset.title || "";
+                    const dateA = a.dataset.updated || "";
+                    const dateB = b.dataset.updated || "";
+
+                    if (mode === 'az') return titleA.localeCompare(titleB);
+                    if (mode === 'za') return titleB.localeCompare(titleA);
+                    if (mode === 'newest') return dateB.localeCompare(dateA);
+                    return 0;
+                });
+                items.forEach(el => container.appendChild(el));
+            }
+
+            sortElements(gridView, gridItems);
+            sortElements(document.getElementById('tableBody'), tableItems);
+        });
     });
 </script>
 {% endblock %}
