@@ -4,7 +4,7 @@ import re
 import time
 import unicodedata
 from dotenv import load_dotenv
-from flask import Flask, abort, render_template, request
+from flask import Flask, abort, redirect, render_template, request
 import requests
 
 load_dotenv()
@@ -244,28 +244,22 @@ def home():
 
     # Điều kiện: Có link sub VÀ đã check Public
     valid_data = [x for x in data if x.get("sub_url") and x.get("is_public")]
+
+    # 1. Sắp xếp theo ngày cập nhật mới nhất
     valid_data.sort(key=lambda x: x.get("last_edited", ""), reverse=True)
 
-    # 1. 5 bộ mới nhất cho Slide
-    slider_data = valid_data[:5]
+    # 2. Lấy ĐÚNG 10 BỘ MỚI NHẤT cho Slide
+    slider_data = valid_data[:10]
+    slider_slugs = {item["slug"] for item in slider_data}
 
-    # 2. 30 bộ TIẾP THEO cho phần Mới cập nhật (từ bộ thứ 6 đến 35, không bị trùng Slide)
-    grid_anime = valid_data[5:35]
+    # 3. LOẠI BỎ 10 BỘ TRÊN SLIDE RA KHỎI DANH SÁCH BÊN DƯỚI
+    list_data = [x for x in valid_data if x["slug"] not in slider_slugs]
 
-    return render_template(
-        "home.html", slider_data=slider_data, latest_anime=grid_anime
-    )
+    # 4. Danh sách phim bên dưới mặc định sắp xếp theo Tên Romanji A-Z
+    list_data.sort(key=lambda x: (x.get("title_ro") or "").lower())
 
-
-@app.route("/list")
-def anime_list():
-    data = get_data()
-
-    # Điều kiện: Có link sub VÀ đã check Public
-    valid_data = [x for x in data if x.get("sub_url") and x.get("is_public")]
-    valid_data.sort(key=lambda x: (x.get("title_ro") or "").lower())
-
-    raw_seasons = list(set([x["year"] for x in valid_data if x.get("year")]))
+    # 5. Thu thập danh sách mùa từ các phim còn lại
+    raw_seasons = list(set([x["year"] for x in list_data if x.get("year")]))
 
     def season_sorter(season_str):
         parts = season_str.strip().split()
@@ -276,7 +270,18 @@ def anime_list():
         return (year, order.get(parts[0].capitalize(), 0))
 
     seasons = sorted(raw_seasons, key=season_sorter, reverse=True)
-    return render_template("list.html", anime_list=valid_data, seasons=seasons)
+
+    return render_template(
+        "home.html",
+        slider_data=slider_data,
+        anime_list=list_data,
+        seasons=seasons,
+    )
+
+
+@app.route("/list")
+def anime_list_redirect():
+    return redirect("/")
 
 
 @app.route("/chat")
