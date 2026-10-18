@@ -79,7 +79,7 @@
             }
         }
 
-        /* --- MÀN HÌNH CHỜ LOAD TRANG VỚI ẢNH GIF RIÊNG --- */
+        /* --- MÀN HÌNH CHỜ LOAD TRANG (PAGE LOADER) --- */
         #page-loader {
             position: fixed;
             inset: 0;
@@ -96,17 +96,14 @@
             visibility: hidden;
             pointer-events: none;
         }
-
-        /* Định hình kích thước ảnh GIF tải trang */
         .loader-gif {
-            width: 140px;          /* Bạn có thể chỉnh to/nhỏ tùy ý ở đây */
+            width: 140px;
             height: auto;
             max-height: 160px;
             object-fit: contain;
             filter: drop-shadow(0 0 15px rgba(255, 42, 109, 0.45));
             margin-bottom: 12px;
         }
-
         .loader-text {
             font-size: 0.85rem;
             letter-spacing: 3px;
@@ -139,7 +136,6 @@
             display: inline-flex;
             align-items: center;
         }
-
         .nav-link-anime {
             color: var(--text-muted) !important;
             font-weight: 600;
@@ -152,6 +148,52 @@
             color: #fff !important;
             background: rgba(255, 255, 255, 0.05);
             box-shadow: 0 0 15px rgba(255, 42, 109, 0.25);
+        }
+
+        /* --- NÚT TRỞ VỀ ĐẦU TRANG (BACK TO TOP) --- */
+        .back-to-top-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(22, 27, 46, 0.8);
+            border: 1px solid var(--border-glass);
+            backdrop-filter: blur(12px);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            z-index: 900;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+        }
+        .back-to-top-btn.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .back-to-top-btn:hover {
+            background: var(--anime-gradient);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(255, 42, 109, 0.55), 0 0 15px rgba(255, 42, 109, 0.4);
+            transform: translateY(-4px) scale(1.08);
+        }
+        @media (max-width: 576px) {
+            .back-to-top-btn {
+                bottom: 22px;
+                right: 20px;
+                width: 42px;
+                height: 42px;
+                font-size: 1rem;
+            }
         }
 
         /* --- HỆ THỐNG GRID CHUNG (PC & MOBILE) --- */
@@ -278,7 +320,7 @@
         <img src="{{ url_for('static', filename='cursor.gif') }}" alt="Cursor">
     </div>
 
-    <!-- MÀN HÌNH CHỜ LOAD TRANG (ĐÃ THAY BẰNG ẢNH GIF RIÊNG) -->
+    <!-- MÀN HÌNH CHỜ LOAD TRANG -->
     <div id="page-loader">
         <img src="{{ url_for('static', filename='loading.gif') }}" class="loader-gif" alt="Loading..." onerror="this.style.display='none'">
         <div class="loader-text"><i class="fas fa-play-circle me-1"></i> CHỜ CHÚT NHÉ...</div>
@@ -305,11 +347,11 @@
                             <i class="fas fa-layer-group me-1"></i> Danh Sách
                         </a>
                     </li>
-					<li class="nav-item">
-						<a class="nav-link-anime {{ 'active' if request.path == '/random' else '' }}" href="/random">
-							<i class="fas fa-dice me-1" style="color: #ff2a6d;"></i> Hôm Nay Xem Gì?
-						</a>
-					</li>
+                    <li class="nav-item">
+                        <a class="nav-link-anime {{ 'active' if request.path == '/random' else '' }}" href="/random">
+                            <i class="fas fa-dice me-1" style="color: #ff2a6d;"></i> Hôm Nay Xem Gì?
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link-anime {{ 'active' if request.path == '/chat' else '' }}" href="/chat">
                             <i class="fab fa-discord me-1" style="color: #5865F2;"></i> Chat
@@ -324,6 +366,11 @@
     <main>
         {% block content %}{% endblock %}
     </main>
+
+    <!-- NÚT TRỞ VỀ ĐẦU TRANG (BACK TO TOP) -->
+    <button id="backToTopBtn" class="back-to-top-btn" title="Lên đầu trang">
+        <i class="fas fa-chevron-up"></i>
+    </button>
 
     <!-- FOOTER -->
     <footer>
@@ -402,7 +449,7 @@
             }
 
             document.addEventListener('mouseover', (e) => {
-                const isHoverTarget = e.target.closest('a, button, input, select, .view-btn, .anime-card-v2, .anime-table tbody tr, .poster-container');
+                const isHoverTarget = e.target.closest('a, button, input, select, .view-btn, .anime-card-v2, .anime-table tbody tr, .poster-container, .back-to-top-btn');
                 if (isHoverTarget) {
                     cursor.classList.add('cursor-hover');
                 } else {
@@ -419,6 +466,31 @@
                 }
             });
         })();
+    </script>
+
+    <!-- 3. SCRIPT ĐIỀU KHIỂN NÚT TRỞ VỀ ĐẦU TRANG -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const backToTopBtn = document.getElementById('backToTopBtn');
+            if (backToTopBtn) {
+                // Theo dõi cuộn trang để ẩn/hiện nút
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 350) {
+                        backToTopBtn.classList.add('show');
+                    } else {
+                        backToTopBtn.classList.remove('show');
+                    }
+                });
+
+                // Cuộn mượt lên đỉnh khi click
+                backToTopBtn.addEventListener('click', () => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            }
+        });
     </script>
 
     {% block scripts %}{% endblock %}
