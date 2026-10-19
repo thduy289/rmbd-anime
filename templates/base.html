@@ -232,12 +232,17 @@
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 42, 109, 0.25);
             background: var(--bg-card-hover);
         }
-        .poster-container {
-            position: relative;
-            padding-top: 142%;
-            overflow: hidden;
-            background: #111422;
-        }
+		.poster-container {
+			position: relative;
+			padding-top: 142%;
+			overflow: hidden;
+			background-color: #111422;
+			/* DÙNG ẢNH LOADING.GIF Ở TÂM KHI ẢNH CHƯA TẢI XONG */
+			background-image: url("{{ url_for('static', filename='loading.gif') }}");
+			background-repeat: no-repeat;
+			background-position: center center;
+			background-size: 55px auto;
+		}
         .poster-container img {
             position: absolute;
             inset: 0;
