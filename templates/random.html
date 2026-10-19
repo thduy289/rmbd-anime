@@ -4,7 +4,6 @@
 
 {% block content %}
 <style>
-    /* TIÊU ĐỀ */
     .random-header {
         text-align: center;
         margin-bottom: 30px;
@@ -19,7 +18,6 @@
         text-transform: uppercase;
     }
 
-    /* BƯỚC 1: CHỌN THỂ LOẠI (TAG CHIPS) */
     .genre-filter-card {
         background: rgba(22, 27, 46, 0.45);
         backdrop-filter: blur(15px);
@@ -81,7 +79,6 @@
         box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), inset 0 0 40px rgba(0,0,0,0.8);
     }
 
-    /* VẠCH KIM ĐỎ TRỎ Ở GIỮA KHUNG */
     .needle {
         position: absolute;
         top: 0;
@@ -112,7 +109,6 @@
         border-bottom: 12px solid var(--anime-pink);
     }
 
-    /* DẢI BĂNG BĂNG CHUYỀN (REEL STRIP) */
     .reel-strip {
         display: flex;
         gap: 14px;
@@ -123,7 +119,7 @@
         transition: transform 6s cubic-bezier(0.12, 0.85, 0.18, 1);
     }
 
-    /* THẺ ANIME TRONG DẢI BĂNG */
+    /* THẺ ANIME TRONG DẢI BĂNG (CÓ NỀN LOADING.GIF CHỜ) */
     .reel-card {
         min-width: 150px;
         max-width: 150px;
@@ -137,9 +133,19 @@
         position: relative;
         box-shadow: 0 8px 20px rgba(0,0,0,0.5);
     }
-    .reel-card img {
+    .reel-card-img-box {
         width: 100%;
         height: 155px;
+        background-color: #111422;
+        background-image: url("{{ url_for('static', filename='loading.gif') }}");
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: 45px auto;
+        overflow: hidden;
+    }
+    .reel-card img {
+        width: 100%;
+        height: 100%;
         object-fit: cover;
     }
     .reel-card-info {
@@ -159,7 +165,6 @@
         width: 100%;
     }
 
-    /* NÚT QUAY */
     .spin-btn-wrapper {
         text-align: center;
         margin-bottom: 40px;
@@ -223,29 +228,39 @@
     .winner-modal-overlay.active .winner-card {
         transform: scale(1);
     }
-    .winner-poster {
+
+    /* KHUNG POSTER THẮNG CUỘC (CÓ NỀN LOADING.GIF CHỜ) */
+    .winner-poster-box {
         width: 160px;
         height: 230px;
-        object-fit: cover;
         border-radius: 12px;
+        overflow: hidden;
         box-shadow: 0 15px 35px rgba(0,0,0,0.8);
         border: 2px solid rgba(255,255,255,0.2);
-        margin-bottom: 20px;
+        margin: 0 auto 20px;
+        background-color: #111422;
+        background-image: url("{{ url_for('static', filename='loading.gif') }}");
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: 50px auto;
+    }
+    .winner-poster {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 </style>
 
 <div class="container py-4">
-    <!-- TIÊU ĐỀ -->
     <div class="random-header">
         <h2 class="random-title"><i class="fas fa-dice text-danger me-2"></i>Hôm Nay Xem Gì?</h2>
         <p class="text-secondary small">Chọn thể loại bạn muốn xem, để chiếc hòm CS2 chọn phim cho bạn!</p>
     </div>
 
-    <!-- BƯỚC 1: BỘ LỌC THỂ LOẠI -->
     <div class="genre-filter-card">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
             <span class="fw-bold text-white small text-uppercase">
-                <i class="fas fa-filter text-danger me-1"></i> Chọn Thể Loại Phim
+                <i class="fas fa-filter text-danger me-1"></i> Bước 1: Chọn Thể Loại Phim
             </span>
             <div class="text-secondary small">
                 Có <span id="poolCount" class="text-white fw-bold">0</span> phim sẵn sàng
@@ -259,13 +274,11 @@
         </div>
     </div>
 
-    <!-- BƯỚC 2: KHUNG ROULETTE CS2 -->
     <div class="roulette-container" id="rouletteBox">
         <div class="needle"></div>
         <div class="reel-strip" id="reelStrip"></div>
     </div>
 
-    <!-- NÚT MỞ HÒM -->
     <div class="spin-btn-wrapper">
         <button class="spin-btn" id="btnSpin">
             <i class="fas fa-play me-2"></i> QUAY NGAY
@@ -279,8 +292,9 @@
         <div class="badge bg-danger px-3 py-1 mb-2 text-uppercase fw-bold" style="background: var(--anime-gradient) !important;">
             🎉 ANIME HÔM NAY CỦA BẠN
         </div>
-        <div class="d-flex justify-content-center">
-            <img src="" id="winnerPoster" class="winner-poster" alt="Winner">
+        <!-- KHUNG CHỨA ẢNH CHIẾN THẮNG CÓ NỀN LOADING.GIF -->
+        <div class="winner-poster-box">
+            <img src="" id="winnerPoster" class="winner-poster" alt="Winner" loading="lazy">
         </div>
         <h3 class="fw-bold text-white mb-1" id="winnerTitle"></h3>
         <p class="text-secondary small fst-italic mb-3" id="winnerTitleEn"></p>
@@ -289,7 +303,6 @@
             <span class="badge bg-secondary-subtle text-light" id="winnerEpisodes"></span>
         </div>
         <div class="d-flex justify-content-center gap-3">
-            <!-- ĐỔI TÊN NÚT SANG TẢI PHỤ ĐỀ -->
             <a href="#" id="winnerLink" class="btn btn-danger px-4 py-2 fw-bold rounded-pill" style="background: var(--anime-gradient); border: none;">
                 <i class="fas fa-download me-2"></i> TẢI PHỤ ĐỀ
             </a>
@@ -303,10 +316,8 @@
 
 {% block scripts %}
 <script>
-    // 1. LẤY VÀ LỌC SẠCH TRÙNG LẶP DỮ LIỆU BAN ĐẦU
     const RAW_ANIME = {{ anime_list | tojson }};
     
-    // Khử trùng lặp qua Map Slug
     const animeMap = new Map();
     RAW_ANIME.forEach(item => {
         const key = item.slug || item.title_ro;
@@ -339,7 +350,6 @@
     const TOTAL_CARDS = 60;
     const WIN_INDEX = 48;
 
-    // 2. ÂM THANH TICK CS2
     let audioCtx = null;
     function playTickSound() {
         try {
@@ -357,7 +367,6 @@
         } catch(e) {}
     }
 
-    // 3. LỌC DANH SÁCH THEO THỂ LOẠI
     function filterAnime() {
         if (selectedGenres.has("all") || selectedGenres.size === 0) {
             currentPool = [...ALL_ANIME];
@@ -373,7 +382,6 @@
         initReel();
     }
 
-    // 4. XỬ LÝ CLICK CHỌN THỂ LOẠI
     genresContainer.addEventListener("click", (e) => {
         const chip = e.target.closest(".genre-chip");
         if (!chip) return;
@@ -403,11 +411,14 @@
         filterAnime();
     });
 
+    // THẺ ANIME CÓ KHUNG CHỨA NỀN LOADING.GIF
     function createCard(item) {
         const el = document.createElement("div");
         el.className = "reel-card";
         el.innerHTML = `
-            <img src="${item.poster_url}" alt="${item.title_ro}" loading="lazy">
+            <div class="reel-card-img-box">
+                <img src="${item.poster_url}" alt="${item.title_ro}" loading="lazy">
+            </div>
             <div class="reel-card-info">
                 <div class="reel-card-title">${item.title_ro}</div>
             </div>
@@ -415,7 +426,6 @@
         return el;
     }
 
-    // 5. TẠO DẢI BĂNG QUAY (THUẬT TOÁN CHỐNG TRÙNG LẶP 2 Ô LIỀN KỀ)
     function getRandomNonAdjacent(pool, previousItem) {
         if (pool.length <= 1) return pool[0];
         let chosen;
@@ -441,15 +451,12 @@
         }
     }
 
-    // 6. KÍCH HOẠT VÒNG QUAY ROULETTE CS2
     btnSpin.addEventListener("click", () => {
         if (currentPool.length < 2) return;
         btnSpin.disabled = true;
 
-        // A. Chọn phim thắng cuộc ngẫu nhiên
         const winner = currentPool[Math.floor(Math.random() * currentPool.length)];
 
-        // B. Gắn phim thắng vào đúng ô WIN_INDEX (và đảm bảo 2 ô liền kề không bị trùng)
         reel.style.transition = "none";
         reel.style.transform = "translateX(0px)";
         reel.innerHTML = "";
@@ -461,7 +468,6 @@
                 item = winner;
             } else {
                 item = getRandomNonAdjacent(currentPool, prev);
-                // Tránh để ô sát cạnh ô thắng bị trùng với ô thắng
                 if (i === WIN_INDEX - 1 && item.slug === winner.slug && currentPool.length > 1) {
                     item = currentPool.find(x => x.slug !== winner.slug) || item;
                 }
@@ -470,16 +476,13 @@
             reel.appendChild(createCard(item));
         }
 
-        // C. Tính tọa độ dừng ở giữa kim
         const viewportCenter = rouletteBox.clientWidth / 2;
         const cardCenter = CARD_WIDTH / 2;
         const targetX = (WIN_INDEX * (CARD_WIDTH + CARD_GAP));
         
-        // Độ lệch ngẫu nhiên (-35px đến +35px)
         const randomOffset = (Math.random() - 0.5) * 70;
         const finalTranslateX = -(targetX - viewportCenter + cardCenter) + randomOffset;
 
-        // D. Chạy Animation 6 giây
         setTimeout(() => {
             reel.style.transition = "transform 6s cubic-bezier(0.12, 0.85, 0.18, 1)";
             reel.style.transform = `translateX(${finalTranslateX}px)`;
@@ -492,7 +495,6 @@
             }, 140);
         }, 50);
 
-        // E. Hiện popup kết quả sau 6.2 giây
         setTimeout(() => {
             btnSpin.disabled = false;
             winnerPoster.src = winner.poster_url;
