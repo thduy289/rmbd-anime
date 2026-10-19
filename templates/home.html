@@ -120,6 +120,31 @@
         color: #fff;
     }
 
+    /* --- KHUNG CHỨA POSTER DẠNG LƯỚI (CÓ HIỆU ỨNG LOADING.GIF NỀN CHỜ) --- */
+    .poster-container {
+        position: relative;
+        padding-top: 142%;
+        overflow: hidden;
+        border-radius: 14px 14px 0 0;
+        background-color: #111422;
+        /* DÙNG ẢNH LOADING.GIF Ở TÂM KHI ẢNH CHƯA TẢI XONG */
+        background-image: url("{{ url_for('static', filename='loading.gif') }}");
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: 55px auto;
+    }
+    .poster-container img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    .anime-card-v2:hover .poster-container img {
+        transform: scale(1.08);
+    }
+
     /* --- BẢNG TABLE PHẲNG TRONG SUỐT --- */
     .anime-table {
         width: 100%;
@@ -181,11 +206,21 @@
         color: var(--anime-pink) !important;
     }
 
+    /* KHUNG THUMBNAIL BẢNG (CÓ LOADING.GIF NỀN CHỜ) */
     .table-thumb-wrapper {
         position: relative;
         margin-right: 14px;
         flex-shrink: 0;
         z-index: 1;
+        width: 50px;
+        height: 72px;
+        border-radius: 8px;
+        background-color: #111422;
+        /* DÙNG LOADING.GIF KÍCH THƯỚC NHỎ Ở TÂM KHI ẢNH BẢNG CHƯA LOAD */
+        background-image: url("{{ url_for('static', filename='loading.gif') }}");
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: 26px auto;
     }
     .table-thumb {
         width: 50px;
@@ -342,7 +377,7 @@
         {% endfor %}
     </div>
 
-    <!-- DẠNG BẢNG (TABLE - ĐÃ BỎ CỘT THAO TÁC, BẤM VÀO HÀNG ĐỂ XEM CHI TIẾT) -->
+    <!-- DẠNG BẢNG (TABLE) -->
     <div id="tableView" class="table-responsive mb-5" style="display: none;">
         <table class="anime-table">
             <thead>
